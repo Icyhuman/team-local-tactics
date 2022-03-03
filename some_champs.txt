@@ -7,3 +7,6 @@ Katina,20,50,30
 Asir,5,5,90
 Cactus,5,90,5
 Luanne,90,5,5
+Peter Smith,45,25,30
+John Green,35,35,30
+Ben Dover,69,11,20
