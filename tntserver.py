@@ -40,9 +40,8 @@ class TntServer:
                 Thread(target=self._gaming, args=(p1, p2)).start()
 
     def _gaming(self, p1, p2):
-        while self._serving:
-            p1.sendall("fuckfuckfuck".encode())
-            p2.sendall("shitshitshit".encode())
+        p2.sendall("Me so sorry game no exist yet".encode())
+        p1.sendall("Me so sorry no game yet".encode())
 
         
 
