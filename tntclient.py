@@ -25,14 +25,39 @@ class TntClient:
         print("''It's called tnt because this game blows''")
         print(" ")
         print(" ")
-        client.gaming()
+        client.junction()
 
+    def junction(self):
+        while True:
+            func=input("What do ye desire?(play, stats, quit)")
+            if(func=="play"):
+                client.gamesetup()
+            elif(func=="stats"):
+                client.stats()
+            elif(func=="quit"):
+                break
+            else:
+                print(f"Man idk what {func} means try again.")
 
-    def gaming(self):
-        self._sock = create_connection((self._server, 5550), timeout=69)
+    def gamesetup(self):
+        self._sock = create_connection((self._server, 5550), timeout=6969)
+        gamertag=input("Choose your gamertag:")
+        setupmsg="g,"+gamertag
+        self._sock.sendall(setupmsg.encode())
         while True:
             messaj = self._sock.recv(self._buffer_size).decode()
+            if(messaj=="rdy2gaming"):
+                break
             print(messaj)
+        self.gaming()
+    
+    def gaming(self):
+        while True:
+            print("glizzy")
+            messaj = self._sock.recv(self._buffer_size).decode()
+            print("glizzy")
+            print(messaj)
+
 
 if __name__ == "__main__":
     server = environ.get("SERVER", "localhost")
