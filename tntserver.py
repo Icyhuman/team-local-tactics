@@ -12,13 +12,16 @@ class TntServer:
         self._host = host
         self._port = port
         self._buffer_size = buffer_size
-        self._heroes = {}
+        self._heroes = ""
         self._gamer_lock = Lock()
         self._waitingplayer=NULL
         self._wpgt=NULL
         self._sock = create_connection((self._backend, 6969), timeout=6969)
         self._sock.sendall("cl,haha".encode())
         self._heroes = self._sock.recv(self._buffer_size).decode()
+        print(self._heroes)
+        self.heros=self._heroes.split("\n")
+        print(self.heros)
 
     def turn_on(self):
         self._welcome_sock = create_server(
@@ -56,8 +59,8 @@ class TntServer:
     def _gaming(self, p1, p2, p1gt, p2gt):
         p1.sendall("rdy2gaming".encode())
         p2.sendall("rdy2gaming".encode())
-        p1.sendall(f"Me so sorry {p1gt} no game yet".encode())
-        p2.sendall(f"Me so sorry {p2gt} game no exist yet".encode())
+        p1.sendall(f"sorry {p1gt} no game yet".encode())
+        p2.sendall(f"sorry {p2gt} game dont exist yet".encode())
 
         
 

@@ -52,11 +52,9 @@ class TntClient:
         self.gaming()
     
     def gaming(self):
-        while True:
-            print("glizzy")
-            messaj = self._sock.recv(self._buffer_size).decode()
-            print("glizzy")
-            print(messaj)
+        print("gamer")
+        messaj = self._sock.recv(self._buffer_size).decode()
+        print(messaj)
 
 
 if __name__ == "__main__":

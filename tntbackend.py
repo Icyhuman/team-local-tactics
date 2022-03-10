@@ -2,7 +2,7 @@
 from os import environ
 from socket import create_server, timeout
 from threading import Thread
-from champlistloader import load_some_champs
+from champlistloader import load_champs_string, load_some_champs
 
 
 class tntBackend:
@@ -11,7 +11,8 @@ class tntBackend:
         self._host = host
         self._port = port
         self._buffer_size = buffer_size
-        self._heroes = load_some_champs()
+        self._heroes = load_champs_string()
+        print("backend online")
 
     def turn_on(self):
         self._welcome_sock = create_server(
@@ -34,12 +35,12 @@ class tntBackend:
                 elif(fun=="sf"):
                     Thread(target=self._statfetch, args=(serv)).start()
                 elif(fun=="sw"):
-                    self.statwrite(content)
+                    self._statwrite(content)
 
 
     def _statwrite(self, content):
         with open("loserlog.txt", 'a') as f:
-            f.write(content)
+            f.write(content+"\n")
 
     def _statfetch(self, serv):
         with open("loserlog.txt", 'r') as f:
