@@ -127,15 +127,21 @@ class TntServer:
         # Print the winner
         if red_score > blue_score:
             results+=f'\n[red]{p1gt} wins! smile emoji'
+            p1res="w;"+results
+            p2res="l;"+results
             logentry=f"sw,{p2gt} lost {blue_score}-{red_score} to {p1gt} cause they suck"
         elif red_score < blue_score:
             results+=f'\n[blue]{p2gt} wins! smile emoji'
+            p1res="l;"+results
+            p2res="w;"+results
             logentry=f"sw,{p1gt} lost {red_score}-{blue_score} to {p2gt} lmao"
         else:
             results+='\nDraw, you both lost lmao'
+            p1res="l;"+results
+            p2res="l;"+results
             logentry=f"sw,{p2gt} and {p1gt} both lost man they are bad"
-        p1.sendall(results.encode())
-        p2.sendall(results.encode())
+        p1.sendall(p1res.encode())
+        p2.sendall(p2res.encode())
         self._sock = create_connection((self._backend, 6969), timeout=6969)
         self._sock.sendall(logentry.encode())
 

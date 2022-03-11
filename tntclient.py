@@ -3,6 +3,7 @@ from os import environ
 from random import randint  
 from socket import create_connection, timeout
 from threading import Thread
+import time
 from rich import print
 from rich.prompt import Prompt
 from rich.table import Table
@@ -18,26 +19,10 @@ class TntClient:
         self._server = server
         self._buffer_size = buffer_size
 
-    def start(self):  #looks lame because the fstring didnt work with my cool ascii so i used old reliable pile o' print
-        print("[red]  _______ ______          __  __   _   _ ______ _________          ______  _____  _  __") #credit: https://www.coolgenerator.com/ascii-text-generator
-        print("[yellow] |__   __|  ____|   /\   |  \/  | | \ | |  ____|__   __\ \        / / __ \|  __ \| |/ /") 
-        print("[green]    | |  | |__     /  \  | \  / | |  \| | |__     | |   \ \  /\  / / |  | | |__) | ' / ")
-        print("[blue]    | |  |  __|   / /\ \ | |\/| | | . ` |  __|    | |    \ \/  \/ /| |  | |  _  /|  <  ")
-        print("[magenta]    | |  | |____ / ____ \| |  | | | |\  | |____   | |     \  /\  / | |__| | | \ \| . \ ")
-        print("[purple]  __|_|__|______/_/__ _\_\_|_ |_|_|_|_\_|______|  |_|      \/  \/   \____/|_|  \_\_|\_\ ")
-        print("[magenta] |__   __|/\   / ____|__   __|_   _/ ____|/ ____| ")
-        print("[blue]    | |  /  \ | |       | |    | || |    | (___  ")
-        print("[green]    | | / /\ \| |       | |    | || |     \___ \ ")
-        print("[yellow]    | |/ ____ \ |____   | |   _| || |____ ____) | ")
-        print("[red]    |_/_/    \_\_____|  |_|  |_____\_____|_____/  " )
-        print(self.tagline())
-        print(" ")
-        print(" ")
-        client.junction()
-
-    def junction(self):
+    def start(self):
+        self.coollogo()
         while True:
-            func=input("What do ye desire?(play, log, quit)")
+            func=input("What do ya want to do?(play, log, quit)")
             if(func=="play"):
                 client.gamesetup()
             elif(func=="log"):
@@ -63,7 +48,7 @@ class TntClient:
             messaj, pnum = self._sock.recv(self._buffer_size).decode().split(",")
             if(messaj=="rdy2gaming"):
                 break
-            print(messaj)
+            self.printmaze()
         self.gaming(pnum)
     
     def gaming(self, pnum):
@@ -98,8 +83,11 @@ class TntClient:
             p2guy= self._sock.recv(self._buffer_size).decode()
             player2.append(p2guy)
             print(p2gt+' chose '+p2guy)
-        dem_results = self._sock.recv(self._buffer_size).decode()
+        win, dem_results = self._sock.recv(self._buffer_size).decode().split(";")
         print(dem_results)
+        self.printwl(win)
+        time.sleep(4)
+        self.coollogo()
 
 
     def tagline(self):   #a function so i can add more taglines if i have time
@@ -130,6 +118,53 @@ class TntClient:
         for champion in champions.values():
             available_champs.add_row(*champion.str_tuple)
         print(available_champs)
+
+    def printmaze(self):
+        print(f"No player 2 yet, play with this maze while you wait"+'\n'+
+        "[cyan]___________________________________  "+'\n'+
+        "| _____ |   | ___ | ___ ___ | |   | |"+'\n'+  #from https://www.asciiart.eu/art-and-design/mazes
+        '| |   | |_| |__ | |_| __|____ | | | |'+'\n'+
+        '| | | |_________|__ |______ |___|_| |'+'\n'+
+        '| |_|   | _______ |______ |   | ____|'+'\n'+
+        '| ___ | |____ | |______ | |_| |____ |'+'\n'+
+        '|___|_|____ | |   ___ | |________ | |'+'\n'+
+        '|   ________| | |__ | |______ | | | |'+'\n'+
+        '| | | ________| | __|____ | | | __| |'+'\n'+
+        '|_| |__ |   | __|__ | ____| | |_| __|'+'\n'+
+        '|   ____| | |____ | |__ |   |__ |__ |'+'\n'+
+        '| |_______|_______|___|___|___|_____|')
+
+    def printwl(self, win):
+        if(win=="l"):
+            print("[red]____    ____  ______    __    __      __        ______        _______. _______ "+'\n'+
+            "\   \  /   / /  __  \  |  |  |  |    |  |      /  __  \      /       ||   ____|"+'\n'+#credit: https://www.coolgenerator.com/ascii-text-generator
+            " \   \/   / |  |  |  | |  |  |  |    |  |     |  |  |  |    |   (----`|  |__   "+'\n'+
+            "  \_    _/  |  |  |  | |  |  |  |    |  |     |  |  |  |     \   \    |   __|  "+'\n'+
+            "    |  |    |  `--'  | |  `--'  |    |  `----.|  `--'  | .----)   |   |  |____ "+'\n'+
+            "    |__|     \______/   \______/     |_______| \______/  |_______/    |_______|")
+        elif(win=="w"):
+            print("[yellow]____    ____  ______    __    __     ____    __    ____  __  .__   __. .__   __.  _______ .______      "+'\n'+
+            "\   \  /   / /  __  \  |  |  |  |    \   \  /  \  /   / |  | |  \ |  | |  \ |  | |   ____||   _  \     "+'\n'+ #credit: https://www.coolgenerator.com/ascii-text-generator
+            " \   \/   / |  |  |  | |  |  |  |     \   \/    \/   /  |  | |   \|  | |   \|  | |  |__   |  |_)  |    "+'\n'+
+            "  \_    _/  |  |  |  | |  |  |  |      \            /   |  | |  . `  | |  . `  | |   __|  |      /     "+'\n'+
+            "    |  |    |  `--'  | |  `--'  |       \    /\    /    |  | |  |\   | |  |\   | |  |____ |  |\  \----."+'\n'+
+            "    |__|     \______/   \______/         \__/  \__/     |__| |__| \__| |__| \__| |_______|| _| `._____|")
+
+    def coollogo(self):
+        print("[red]  _______ ______          __  __   _   _ ______ _________          ______  _____  _  __") #credit: https://www.coolgenerator.com/ascii-text-generator
+        print("[yellow] |__   __|  ____|   /\   |  \/  | | \ | |  ____|__   __\ \        / / __ \|  __ \| |/ /") 
+        print("[green]    | |  | |__     /  \  | \  / | |  \| | |__     | |   \ \  /\  / / |  | | |__) | ' / ")
+        print("[blue]    | |  |  __|   / /\ \ | |\/| | | . ` |  __|    | |    \ \/  \/ /| |  | |  _  /|  <  ")
+        print("[magenta]    | |  | |____ / ____ \| |  | | | |\  | |____   | |     \  /\  / | |__| | | \ \| . \ ")
+        print("[purple]  __|_|__|______/_/__ _\_\_|_ |_|_|_|_\_|______|  |_|      \/  \/   \____/|_|  \_\_|\_\ ")
+        print("[magenta] |__   __|/\   / ____|__   __|_   _/ ____|/ ____| ")
+        print("[blue]    | |  /  \ | |       | |    | || |    | (___  ")
+        print("[green]    | | / /\ \| |       | |    | || |     \___ \ ")
+        print("[yellow]    | |/ ____ \ |____   | |   _| || |____ ____) | ")
+        print("[red]    |_/_/    \_\_____|  |_|  |_____\_____|_____/  " )
+        print(self.tagline())
+        print(" ")
+        print(" ")
 
     def input_champion(self, prompt: str,
                    color: str,
