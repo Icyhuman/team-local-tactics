@@ -1,5 +1,6 @@
 from getpass import getpass
-from os import environ  
+from os import environ
+from random import randint  
 from socket import create_connection, timeout
 from threading import Thread
 from rich import print
@@ -36,15 +37,22 @@ class TntClient:
 
     def junction(self):
         while True:
-            func=input("What do ye desire?(play, stats, quit)")
+            func=input("What do ye desire?(play, log, quit)")
             if(func=="play"):
                 client.gamesetup()
-            elif(func=="stats"):
+            elif(func=="log"):
                 client.stats()
             elif(func=="quit"):
                 break
             else:
                 print(f"Man idk what {func} means try again.")
+
+    def stats(self):
+        self._sock = create_connection((self._server, 5550), timeout=6969)
+        setupmsg="s,please"
+        self._sock.sendall(setupmsg.encode())
+        stats=self._sock.recv(self._buffer_size).decode()
+        print(stats)
 
     def gamesetup(self):
         self._sock = create_connection((self._server, 5550), timeout=6969)
@@ -59,7 +67,7 @@ class TntClient:
         self.gaming(pnum)
     
     def gaming(self, pnum):
-        print("gamer")
+        print("game starting:")
         self._sock.sendall("ty".encode())
         self.champs = self._sock.recv(self._buffer_size).decode()
         self.cdict=champ_to_dict(self.champs)
@@ -69,33 +77,45 @@ class TntClient:
         if(pnum=="1"):
             self.input_champion('choose your champ', 'red', self.cdict, player1, player2)
         else:
-            p1guy= self._sock.recv(self._buffer_size).decode()
+            p1guy, p1gt= self._sock.recv(self._buffer_size).decode().split(',')
             player1.append(p1guy)
-            print('Bad guy chose '+p1guy)
+            print(p1gt+' chose '+p1guy)
         if(pnum=="2"):
             self.input_champion('choose your champ', 'blue', self.cdict, player2, player1)
         else:
-            p2guy= self._sock.recv(self._buffer_size).decode()
+            p2guy, p2gt= self._sock.recv(self._buffer_size).decode().split(',')
             player2.append(p2guy)
-            print('Bad guy chose '+p2guy)
+            print(p2gt+' chose '+p2guy)
         if(pnum=="1"):
             self.input_champion('choose your champ', 'red', self.cdict, player1, player2)
         else:
             p1guy= self._sock.recv(self._buffer_size).decode()
             player1.append(p1guy)
-            print('Bad guy chose '+p1guy)
+            print(p1gt+' chose '+p1guy)
         if(pnum=="2"):
             self.input_champion('choose your champ', 'blue', self.cdict, player2, player1)
         else:
             p2guy= self._sock.recv(self._buffer_size).decode()
             player2.append(p2guy)
-            print('Bad guy chose '+p2guy)
+            print(p2gt+' chose '+p2guy)
         dem_results = self._sock.recv(self._buffer_size).decode()
         print(dem_results)
 
 
     def tagline(self):   #a function so i can add more taglines if i have time
-        return "''We're totally not a clone of DOS Auto Chess''"
+        num=randint(1, 6)
+        if(num==1):
+            return "''We're totally not a clone of DOS Auto Chess''"
+        if(num==2):
+            return "''It's called tnt because this game blows''"
+        if(num==3):
+            return "''Like Minecraft if Minecraft was an auto battler''"
+        if(num==4):
+            return "''tagline''"
+        if(num==5):
+            return "''One of the games of all time''"
+        if(num==6):
+            return "''original game do not steal''"
 
     def print_available_champs(self, champions: dict[Champion]) -> None:
         # Create a table containing available champions
@@ -103,9 +123,9 @@ class TntClient:
         # Add the columns Name, probability of rock, probability of paper and
         # probability of scissors
         available_champs.add_column("Name", style="cyan", no_wrap=True)
-        available_champs.add_column("prob(:raised_fist-emoji:)", justify="center")
-        available_champs.add_column("prob(:raised_hand-emoji:)", justify="center")
-        available_champs.add_column("prob(:victory_hand-emoji:)", justify="center")
+        available_champs.add_column("prob(R)", justify="center")
+        available_champs.add_column("prob(P)", justify="center")
+        available_champs.add_column("prob(S)", justify="center")
         # Populate the table
         for champion in champions.values():
             available_champs.add_row(*champion.str_tuple)

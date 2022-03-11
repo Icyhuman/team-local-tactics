@@ -20,7 +20,6 @@ class TntServer:
         self._gamer_lock = Lock()
         self._waitingplayer=NULL
         self._wpgt=NULL
-        self._sock = create_connection((self._backend, 6969), timeout=6969)
         print("servers be like lmao im on rn")
 
     def turn_on(self):
@@ -42,7 +41,14 @@ class TntServer:
                 if(fun=="g"):
                     self._gamesetup(player, gtag)
                 elif(fun=="s"):
-                    Thread(target=self._statfetch, args=(player)).start()
+                    self._statfetch(player)
+
+    def _statfetch(self, player):
+        self._sock = create_connection((self._backend, 6969), timeout=6969)
+        self._sock.sendall("sf,haha".encode())
+        log = self._sock.recv(self._buffer_size)
+        player.sendall(log)
+        player.close()
 
     def _gamesetup(self, player, gtag):
         if(self._waitingplayer==NULL):
@@ -59,9 +65,10 @@ class TntServer:
     def _gaming(self, p1, p2, p1gt, p2gt):
         p1.sendall("rdy2gaming,1".encode())
         p2.sendall("rdy2gaming,2".encode())
+        self._sock = create_connection((self._backend, 6969), timeout=6969)
         self._sock.sendall("cl,haha".encode())
         self._heroes = self._sock.recv(self._buffer_size).decode()
-        print(self._heroes)
+        print("Doin a match doin doin a match")
         self._herodict=champ_to_dict(self._heroes)
         p1.recv(self._buffer_size)
         p2.recv(self._buffer_size)
@@ -71,10 +78,12 @@ class TntServer:
         player2 = []
         p1champ=p1.recv(self._buffer_size).decode()
         player1.append(p1champ)
-        p2.sendall(p1champ.encode())
+        tosend=p1champ+','+p1gt
+        p2.sendall(tosend.encode())
         p2champ=p2.recv(self._buffer_size).decode()
         player2.append(p2champ)
-        p1.sendall(p2champ.encode())
+        tosend=p2champ+','+p2gt
+        p1.sendall(tosend.encode())
         p1champ=p1.recv(self._buffer_size).decode()
         player1.append(p1champ)
         p2.sendall(p1champ.encode())
@@ -112,18 +121,18 @@ class TntServer:
 
         # Print the score
         red_score, blue_score = match.score
-        results+=f'Red: {red_score}\n'
-        results+=f'Blue: {blue_score}'
+        results+=f'{p1gt}: {red_score}\n'
+        results+=f'{p2gt}: {blue_score}'
 
         # Print the winner
         if red_score > blue_score:
-            results+='\n[red]Red victory! smile emoji'
-            logentry=f"sw,{p2gt} lost to {p1gt} cause they suck"
+            results+=f'\n[red]{p1gt} wins! smile emoji'
+            logentry=f"sw,{p2gt} lost {blue_score}-{red_score} to {p1gt} cause they suck"
         elif red_score < blue_score:
-            results+='\n[blue]Blue victory! smile emoji'
-            logentry=f"sw,{p1gt} lost to {p2gt} lmao"
+            results+=f'\n[blue]{p2gt} wins! smile emoji'
+            logentry=f"sw,{p1gt} lost {red_score}-{blue_score} to {p2gt} lmao"
         else:
-            results+='\nDraw neutral emoji'
+            results+='\nDraw, you both lost lmao'
             logentry=f"sw,{p2gt} and {p1gt} both lost man they are bad"
         p1.sendall(results.encode())
         p2.sendall(results.encode())

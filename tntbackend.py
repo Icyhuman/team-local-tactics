@@ -33,7 +33,7 @@ class tntBackend:
                 if(fun=="cl"):
                     serv.sendall(self._heroes.encode())
                 elif(fun=="sf"):
-                    Thread(target=self._statfetch, args=(serv)).start()
+                    self._statfetch(serv)
                 elif(fun=="sw"):
                     self._statwrite(content)
 
