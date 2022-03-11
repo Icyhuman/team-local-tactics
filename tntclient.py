@@ -91,7 +91,7 @@ class TntClient:
 
 
     def tagline(self):   #a function so i can add more taglines if i have time
-        num=randint(1, 6)
+        num=randint(1, 7)
         if(num==1):
             return "''We're totally not a clone of DOS Auto Chess''"
         if(num==2):
@@ -104,6 +104,8 @@ class TntClient:
             return "''One of the games of all time''"
         if(num==6):
             return "''original game do not steal''"
+        if(num==7):
+            return "''gitlab didn't let me tag my final commit so i made an excuse to commit again''"
 
     def print_available_champs(self, champions: dict[Champion]) -> None:
         # Create a table containing available champions
