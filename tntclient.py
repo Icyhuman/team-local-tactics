@@ -71,22 +71,27 @@ class TntClient:
         else:
             p1guy= self._sock.recv(self._buffer_size).decode()
             player1.append(p1guy)
-            print(player1)
+            print('Bad guy chose '+p1guy)
         if(pnum=="2"):
             self.input_champion('choose your champ', 'blue', self.cdict, player2, player1)
         else:
             p2guy= self._sock.recv(self._buffer_size).decode()
             player2.append(p2guy)
+            print('Bad guy chose '+p2guy)
         if(pnum=="1"):
             self.input_champion('choose your champ', 'red', self.cdict, player1, player2)
         else:
             p1guy= self._sock.recv(self._buffer_size).decode()
             player1.append(p1guy)
+            print('Bad guy chose '+p1guy)
         if(pnum=="2"):
             self.input_champion('choose your champ', 'blue', self.cdict, player2, player1)
         else:
             p2guy= self._sock.recv(self._buffer_size).decode()
             player2.append(p2guy)
+            print('Bad guy chose '+p2guy)
+        dem_results = self._sock.recv(self._buffer_size).decode()
+        print(dem_results)
 
 
     def tagline(self):   #a function so i can add more taglines if i have time

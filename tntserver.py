@@ -87,51 +87,48 @@ class TntServer:
         )
         match.play()
 
-        # Print a summary
-        self.print_match_summary(match)
+        # Handle the summary
+        self.handle_match_summary(match, p1, p2, p1gt, p2gt)
 
-    def print_match_summary(self, match: Match) -> None:
-
-        EMOJI = {
-            Shape.ROCK: ':raised_fist-emoji:',
-            Shape.PAPER: ':raised_hand-emoji:',
-            Shape.SCISSORS: ':victory_hand-emoji:'
+    def handle_match_summary(self, match: Match, p1, p2, p1gt, p2gt) -> None:
+        results=""
+        MOVE = {
+            Shape.ROCK: 'R',
+            Shape.PAPER: 'P',
+            Shape.SCISSORS: 'S'
         }
 
         # For each round print a table with the results
         for index, round in enumerate(match.rounds):
 
             # Create a table containing the results of the round
-            round_summary = Table(title=f'Round {index+1}')
-
-            # Add columns for each team
-            round_summary.add_column("Red",
-                                    style="red",
-                                    no_wrap=True)
-            round_summary.add_column("Blue",
-                                    style="blue",
-                                    no_wrap=True)
-
+            results+=f'Round {index+1}\n'
             # Populate the table
             for key in round:
                 red, blue = key.split(', ')
-                round_summary.add_row(f'{red} {EMOJI[round[key].red]}',
-                                    f'{blue} {EMOJI[round[key].blue]}')
-            print(round_summary)
+                results+=f'{red} {MOVE[round[key].red]}, '
+                results+=f'{blue} {MOVE[round[key].blue]}\n'
             print('\n')
 
         # Print the score
         red_score, blue_score = match.score
-        print(f'Red: {red_score}\n'
-            f'Blue: {blue_score}')
+        results+=f'Red: {red_score}\n'
+        results+=f'Blue: {blue_score}'
 
         # Print the winner
         if red_score > blue_score:
-            print('\n[red]Red victory! :grin:')
+            results+='\n[red]Red victory! smile emoji'
+            logentry=f"sw,{p2gt} lost to {p1gt} cause they suck"
         elif red_score < blue_score:
-            print('\n[blue]Blue victory! :grin:')
+            results+='\n[blue]Blue victory! smile emoji'
+            logentry=f"sw,{p1gt} lost to {p2gt} lmao"
         else:
-            print('\nDraw :expressionless:')
+            results+='\nDraw neutral emoji'
+            logentry=f"sw,{p2gt} and {p1gt} both lost man they are bad"
+        p1.sendall(results.encode())
+        p2.sendall(results.encode())
+        self._sock = create_connection((self._backend, 6969), timeout=6969)
+        self._sock.sendall(logentry.encode())
 
         
 
