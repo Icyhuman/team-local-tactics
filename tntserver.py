@@ -3,6 +3,10 @@ from contextlib import nullcontext
 from os import environ
 from socket import create_connection, create_server, timeout
 from threading import Lock, Thread
+from rich.table import Table
+
+from champlistloader import champ_to_dict
+from core import Champion, Match, Shape, Team
 
 
 class TntServer:
@@ -17,11 +21,7 @@ class TntServer:
         self._waitingplayer=NULL
         self._wpgt=NULL
         self._sock = create_connection((self._backend, 6969), timeout=6969)
-        self._sock.sendall("cl,haha".encode())
-        self._heroes = self._sock.recv(self._buffer_size).decode()
-        print(self._heroes)
-        self.heros=self._heroes.split("\n")
-        print(self.heros)
+        print("servers be like lmao im on rn")
 
     def turn_on(self):
         self._welcome_sock = create_server(
@@ -46,7 +46,7 @@ class TntServer:
 
     def _gamesetup(self, player, gtag):
         if(self._waitingplayer==NULL):
-            player.sendall("Waiting for p2...".encode())
+            player.sendall("Waiting for p2...,hehe".encode())
             self._waitingplayer=player
             self._wpgt=gtag
         else:
@@ -57,10 +57,81 @@ class TntServer:
             Thread(target=self._gaming, args=(p1, player, p1gt, gtag)).start()
 
     def _gaming(self, p1, p2, p1gt, p2gt):
-        p1.sendall("rdy2gaming".encode())
-        p2.sendall("rdy2gaming".encode())
-        p1.sendall(f"sorry {p1gt} no game yet".encode())
-        p2.sendall(f"sorry {p2gt} game dont exist yet".encode())
+        p1.sendall("rdy2gaming,1".encode())
+        p2.sendall("rdy2gaming,2".encode())
+        self._sock.sendall("cl,haha".encode())
+        self._heroes = self._sock.recv(self._buffer_size).decode()
+        print(self._heroes)
+        self._herodict=champ_to_dict(self._heroes)
+        p1.recv(self._buffer_size)
+        p2.recv(self._buffer_size)
+        p1.sendall(self._heroes.encode())
+        p2.sendall(self._heroes.encode())
+        player1 = []
+        player2 = []
+        p1champ=p1.recv(self._buffer_size).decode()
+        player1.append(p1champ)
+        p2.sendall(p1champ.encode())
+        p2champ=p2.recv(self._buffer_size).decode()
+        player2.append(p2champ)
+        p1.sendall(p2champ.encode())
+        p1champ=p1.recv(self._buffer_size).decode()
+        player1.append(p1champ)
+        p2.sendall(p1champ.encode())
+        p2champ=p2.recv(self._buffer_size).decode()
+        player2.append(p2champ)
+        p1.sendall(p2champ.encode())
+        match = Match(
+        Team([self._herodict[name] for name in player1]),
+        Team([self._herodict[name] for name in player2])
+        )
+        match.play()
+
+        # Print a summary
+        self.print_match_summary(match)
+
+    def print_match_summary(self, match: Match) -> None:
+
+        EMOJI = {
+            Shape.ROCK: ':raised_fist-emoji:',
+            Shape.PAPER: ':raised_hand-emoji:',
+            Shape.SCISSORS: ':victory_hand-emoji:'
+        }
+
+        # For each round print a table with the results
+        for index, round in enumerate(match.rounds):
+
+            # Create a table containing the results of the round
+            round_summary = Table(title=f'Round {index+1}')
+
+            # Add columns for each team
+            round_summary.add_column("Red",
+                                    style="red",
+                                    no_wrap=True)
+            round_summary.add_column("Blue",
+                                    style="blue",
+                                    no_wrap=True)
+
+            # Populate the table
+            for key in round:
+                red, blue = key.split(', ')
+                round_summary.add_row(f'{red} {EMOJI[round[key].red]}',
+                                    f'{blue} {EMOJI[round[key].blue]}')
+            print(round_summary)
+            print('\n')
+
+        # Print the score
+        red_score, blue_score = match.score
+        print(f'Red: {red_score}\n'
+            f'Blue: {blue_score}')
+
+        # Print the winner
+        if red_score > blue_score:
+            print('\n[red]Red victory! :grin:')
+        elif red_score < blue_score:
+            print('\n[blue]Blue victory! :grin:')
+        else:
+            print('\nDraw :expressionless:')
 
         
 

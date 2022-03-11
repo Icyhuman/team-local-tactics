@@ -2,7 +2,7 @@
 from os import environ
 from socket import create_server, timeout
 from threading import Thread
-from champlistloader import load_champs_string, load_some_champs
+from champlistloader import load_champs_string, load_loserlog, load_some_champs
 
 
 class tntBackend:
@@ -43,9 +43,8 @@ class tntBackend:
             f.write(content+"\n")
 
     def _statfetch(self, serv):
-        with open("loserlog.txt", 'r') as f:
-            log=f.read()
-            serv.sendall(log.encode())
+        log=load_loserlog()
+        serv.sendall(log.encode())
 
 if __name__ == "__main__":
     host = environ.get("HOST", "localhost")
